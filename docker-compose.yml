@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: skillswap-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: skillswap
+    networks:
+      - skillswap-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: skillswap-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - skillswap-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skillswap-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/skillswap
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=${JWT_SECRET:-skillswap_prod_secret_change_me}
+      - JWT_EXPIRES_IN=7d
+      - CLIENT_URL=http://localhost:3000
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - skillswap-network
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: skillswap-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+      - NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - skillswap-network
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  redis_data:
+
+networks:
+  skillswap-network:
+    driver: bridge

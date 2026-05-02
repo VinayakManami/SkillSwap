@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* SkillSwap Design System */
+@theme inline {
+  --color-primary: #6366f1;
+  --color-primary-light: #818cf8;
+  --color-primary-dark: #4f46e5;
+  --color-secondary: #06b6d4;
+  --color-secondary-light: #22d3ee;
+  --color-accent: #f59e0b;
+  --color-accent-light: #fbbf24;
+  --color-success: #10b981;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  
+  /* Dark theme */
+  --color-dark-bg: #0f0f23;
+  --color-dark-surface: #1a1a2e;
+  --color-dark-card: #16213e;
+  --color-dark-border: #2a2a4a;
+  --color-dark-text: #e2e8f0;
+  --color-dark-muted: #94a3b8;
+  
+  /* Glass effect colors */
+  --color-glass: rgba(255, 255, 255, 0.05);
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Base dark theme */
+body {
+  background: var(--color-dark-bg);
+  color: var(--color-dark-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-dark-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-dark-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Glass card effect */
+.glass-card {
+  background: rgba(22, 33, 62, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 16px;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effects */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3), 0 0 60px rgba(99, 102, 241, 0.1);
+}
+.glow-secondary {
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3), 0 0 60px rgba(6, 182, 212, 0.1);
+}
+
+/* Animated gradient background */
+.animated-gradient {
+  background: linear-gradient(-45deg, #0f0f23, #1a1a2e, #16213e, #0a0a1a);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Pulse animation for online status */
+.pulse-online {
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Skeleton loading animation */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-dark-surface) 25%, var(--color-dark-card) 50%, var(--color-dark-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
