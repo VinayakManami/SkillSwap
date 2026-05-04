@@ -144,12 +144,13 @@ export default function ChatRoomPage({ params }) {
           </div>
         ) : (
           messages.map((msg, i) => {
-            const senderIdStr = msg.senderId?._id || msg.senderId?.id || (typeof msg.senderId === 'string' ? msg.senderId : null);
+            const rawSender = msg.senderId || msg.sender || msg.sender_id;
+            const senderIdStr = rawSender?._id || rawSender?.id || (typeof rawSender === 'string' ? rawSender : null);
             const currentUserId = user?._id || user?.id;
-            const isMine = senderIdStr && currentUserId && senderIdStr === currentUserId;
+            const isMine = senderIdStr && currentUserId && String(senderIdStr).toLowerCase() === String(currentUserId).toLowerCase();
             return (
               <motion.div key={msg._id || i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                className={`flex w-full ${isMine ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[70%] px-4 py-2.5 rounded-2xl text-sm ${
                   isMine
                     ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-br-md'
