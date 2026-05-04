@@ -57,11 +57,10 @@ A real-time peer-to-peer skill exchange platform where users teach and learn fro
 |-------|-----------|
 | **Frontend** | Next.js (App Router), React, Tailwind CSS, Framer Motion, Three.js |
 | **Backend** | Node.js, Express.js |
-| **Database** | MongoDB (Mongoose ODM) |
-| **Cache** | Redis (ioredis) |
+| **Database** | Supabase (PostgreSQL) |
 | **Real-Time** | Socket.io, WebRTC |
 | **Auth** | JWT, bcrypt, Passport.js (Google OAuth) |
-| **Deployment** | Docker, Docker Compose, GitHub Actions CI/CD |
+| **Deployment** | Vercel (Frontend), Render (Backend), Supabase |
 
 ---
 
@@ -69,8 +68,7 @@ A real-time peer-to-peer skill exchange platform where users teach and learn fro
 
 ### Prerequisites
 - Node.js 18+
-- MongoDB (local or Atlas)
-- Redis (optional, degrades gracefully)
+- Supabase Project (URL and Service Role Key)
 
 ### Quick Start
 
@@ -91,30 +89,24 @@ npm install
 npm run dev             # Starts on http://localhost:3000
 ```
 
-### Docker Setup
-```bash
-# Run everything with Docker Compose
-docker-compose up -d
-
-# Access:
-# Frontend: http://localhost:3000
-# Backend:  http://localhost:5000
-# MongoDB:  localhost:27017
-# Redis:    localhost:6379
-```
-
 ### Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | Backend server port | `5000` |
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/skillswap` |
+| `SUPABASE_URL` | Supabase Project URL | Required |
+| `SUPABASE_SERVICE_ROLE_KEY`| Supabase Service Role Key | Required |
 | `JWT_SECRET` | Secret key for JWT tokens | Required |
 | `JWT_EXPIRES_IN` | Token expiry duration | `7d` |
-| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
 | `CLIENT_URL` | Frontend URL for CORS | `http://localhost:3000` |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID | Optional |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth secret | Optional |
+
+### Deployment
+This project is configured for cloud deployment:
+- **Frontend**: Deploy on [Vercel](https://vercel.com).
+- **Backend**: Deploy on [Render](https://render.com) as a Web Service.
+- **Database**: Managed by [Supabase](https://supabase.com).
 
 ---
 
@@ -206,14 +198,12 @@ skillswapproject/
 ├── backend/                  # Express API (Port 5000)
 │   └── src/
 │       ├── server.js         # Entry point
-│       ├── config/           # DB, Redis, env config
-│       ├── models/           # Mongoose schemas
+│       ├── config/           # Supabase, env config
 │       ├── controllers/      # Business logic
 │       ├── routes/           # REST endpoints
 │       ├── middleware/       # Auth, admin, errors
 │       └── socket/           # Chat & WebRTC signaling
 │
-├── docker-compose.yml        # Full stack deployment
 └── .github/workflows/        # CI/CD pipeline
 ```
 
@@ -227,7 +217,7 @@ skillswapproject/
 - **Corporate Plans** — Team skill exchange for companies
 
 ## 📈 Scaling to 1M+ Users
-- **Database**: MongoDB Atlas sharding + read replicas
+- **Database**: Supabase connection pooling and read replicas
 - **Cache**: Redis Cluster for sessions, presence, and rate limiting
 - **WebSocket**: Socket.io with Redis Adapter across multiple Node.js instances
 - **Media**: Transition from P2P to SFU (LiveKit/Mediasoup) for video
