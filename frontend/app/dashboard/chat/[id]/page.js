@@ -118,11 +118,11 @@ export default function ChatRoomPage({ params }) {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => otherUser?._id && router.push(`/dashboard/video/${otherUser._id}?caller=true&name=${encodeURIComponent(otherUser.name)}`)}
+          <button onClick={() => otherUser?._id && router.push(`/dashboard/video/${otherUser._id}?caller=true&name=${encodeURIComponent(otherUser.name)}&type=audio`)}
             className="p-2.5 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors" title="Audio call">
             <Phone className="w-5 h-5" />
           </button>
-          <button onClick={() => otherUser?._id && router.push(`/dashboard/video/${otherUser._id}?caller=true&name=${encodeURIComponent(otherUser.name)}`)}
+          <button onClick={() => otherUser?._id && router.push(`/dashboard/video/${otherUser._id}?caller=true&name=${encodeURIComponent(otherUser.name)}&type=video`)}
             className="p-2.5 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-colors" title="Video call">
             <Video className="w-5 h-5" />
           </button>

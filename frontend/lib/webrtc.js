@@ -13,18 +13,62 @@ export class WebRTCManager {
     this.onRemoteStream = null;
     this.onConnectionStateChange = null;
 
-    // STUN/TURN servers for NAT traversal
+    // STUN + TURN servers for NAT traversal
+    // Uses Metered Open Relay (free 20GB/month) for TURN relay
     this.config = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
+        {
+          urls: 'turn:staticauth.openrelay.metered.ca:80',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turn:staticauth.openrelay.metered.ca:443',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turn:staticauth.openrelay.metered.ca:443?transport=tcp',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+        {
+          urls: 'turns:staticauth.openrelay.metered.ca:443?transport=tcp',
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
       ],
+      iceCandidatePoolSize: 10,
     };
   }
 
   /**
+   * Optionally fetch dynamic TURN credentials from Metered API
+   * Call this before createPeerConnection if you have a Metered API key
+   */
+  async fetchTurnCredentials() {
+    const apiKey = process.env.NEXT_PUBLIC_METERED_API_KEY;
+    if (!apiKey) return; // Use static credentials as fallback
+
+    try {
+      const response = await fetch(
+        `https://skillswap.metered.live/api/v1/turn/credentials?apiKey=${apiKey}`
+      );
+      const iceServers = await response.json();
+      if (Array.isArray(iceServers) && iceServers.length > 0) {
+        this.config.iceServers = iceServers;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch TURN credentials, using static fallback:', err.message);
+    }
+  }
+
+  /**
    * Get local media stream (camera + microphone)
+   * @param {boolean} video - Request video (false for audio-only calls)
+   * @param {boolean} audio - Request audio
    */
   async getLocalStream(video = true, audio = true) {
     try {
@@ -80,6 +124,11 @@ export class WebRTCManager {
       if (this.onConnectionStateChange) {
         this.onConnectionStateChange(state);
       }
+    };
+
+    // Log ICE connection state for debugging
+    this.peerConnection.oniceconnectionstatechange = () => {
+      console.log('ICE connection state:', this.peerConnection?.iceConnectionState);
     };
 
     return this.peerConnection;
@@ -225,3 +274,4 @@ export class WebRTCManager {
     this.remoteStream = null;
   }
 }
+

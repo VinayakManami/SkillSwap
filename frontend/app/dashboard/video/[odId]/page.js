@@ -59,8 +59,20 @@ export default function VideoCallPage({ params }) {
 
     const setupCall = async () => {
       try {
-        // Get local media
-        const localStream = await webrtc.getLocalStream(true, true);
+        // Determine call type from URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const isCaller = urlParams.get('caller') === 'true';
+        const callerName = urlParams.get('name') || 'Unknown';
+        const callType = urlParams.get('type') || 'video';
+        const wantVideo = callType !== 'audio';
+        setRemoteName(callerName);
+        setVideoEnabled(wantVideo);
+
+        // Fetch TURN credentials (falls back to static if no API key)
+        await webrtc.fetchTurnCredentials();
+
+        // Get local media (audio-only for voice calls)
+        const localStream = await webrtc.getLocalStream(wantVideo, true);
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = localStream;
         }
@@ -84,19 +96,13 @@ export default function VideoCallPage({ params }) {
           }
         };
 
-        // Check URL params to determine if caller or callee
-        const urlParams = new URLSearchParams(window.location.search);
-        const isCaller = urlParams.get('caller') === 'true';
-        const callerName = urlParams.get('name') || 'Unknown';
-        setRemoteName(callerName);
-
         if (isCaller) {
           // Caller: initiate the call
           setCallStatus('ringing');
           socket.emit('call:initiate', {
             targetUserId: odId,
             callerName: user.name,
-            callType: 'video',
+            callType,
           });
         } else {
           // Callee: we were redirected here after accepting
