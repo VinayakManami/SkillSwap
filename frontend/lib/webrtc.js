@@ -12,6 +12,7 @@ export class WebRTCManager {
     this.screenStream = null;
     this.onRemoteStream = null;
     this.onConnectionStateChange = null;
+    this.iceCandidateQueue = [];
 
     // STUN + TURN servers for NAT traversal
     // Uses Metered Open Relay (free 20GB/month) for TURN relay
@@ -161,6 +162,8 @@ export class WebRTCManager {
       targetUserId: callerId,
       answer: this.peerConnection.localDescription,
     });
+    
+    this.processIceCandidateQueue();
   }
 
   /**
@@ -169,6 +172,7 @@ export class WebRTCManager {
   async handleAnswer(answer) {
     if (!this.peerConnection) return;
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    this.processIceCandidateQueue();
   }
 
   /**
@@ -176,10 +180,31 @@ export class WebRTCManager {
    */
   async handleIceCandidate(candidate) {
     if (!this.peerConnection) return;
+    
+    // If remote description is not yet set, queue the candidate
+    if (!this.peerConnection.remoteDescription) {
+      this.iceCandidateQueue.push(candidate);
+      return;
+    }
+    
     try {
       await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     } catch (err) {
       console.error('Error adding ICE candidate:', err);
+    }
+  }
+
+  /**
+   * Process queued ICE candidates after remote description is set
+   */
+  async processIceCandidateQueue() {
+    while (this.iceCandidateQueue.length > 0) {
+      const candidate = this.iceCandidateQueue.shift();
+      try {
+        await this.peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (err) {
+        console.error('Error adding queued ICE candidate:', err);
+      }
     }
   }
 

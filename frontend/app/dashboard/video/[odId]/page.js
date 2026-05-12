@@ -107,6 +107,7 @@ export default function VideoCallPage({ params }) {
         } else {
           // Callee: we were redirected here after accepting
           setCallStatus('connecting');
+          socket.emit('call:accept', { targetUserId: odId });
         }
 
         // ---- Socket event handlers ----

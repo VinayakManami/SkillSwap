@@ -45,7 +45,6 @@ export default function IncomingCall() {
     const socket = getSocket();
     if (!socket || !incomingCall) return;
 
-    socket.emit('call:accept', { targetUserId: incomingCall.callerId });
     const callerId = incomingCall.callerId;
     const callerName = incomingCall.callerName;
     setIncomingCall(null);
