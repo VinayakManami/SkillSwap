@@ -24,15 +24,43 @@ const server = http.createServer(app);
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: config.clientUrl,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (origin.endsWith('-vinayakmanamis-projects.vercel.app') ||
+          origin.endsWith('.vercel.app') ||
+          origin === (process.env.CLIENT_URL || 'http://localhost:3000') ||
+          origin === 'http://localhost:3000') {
+        return callback(null, true);
+      }
+      callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST'],
     credentials: true,
   },
 });
 
+// CORS – allow Vercel preview URLs + production URL + local dev
+const allowedOrigins = [
+  config.clientUrl,
+  'http://localhost:3000',
+].filter(Boolean);
+
+function corsOriginCheck(origin, callback) {
+  // Allow server-to-server / curl / mobile (no origin header)
+  if (!origin) return callback(null, true);
+
+  // Allow any Vercel deployment for this project
+  if (origin.endsWith('-vinayakmanamis-projects.vercel.app') ||
+      origin.endsWith('.vercel.app') ||
+      allowedOrigins.includes(origin)) {
+    return callback(null, true);
+  }
+  callback(new Error('Not allowed by CORS'));
+}
+
 // Middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors({ origin: config.clientUrl, credentials: true }));
+app.use(cors({ origin: corsOriginCheck, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (config.nodeEnv === 'development') {
