@@ -28,6 +28,7 @@ export default function VideoCallPage({ params }) {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [screenSharing, setScreenSharing] = useState(false);
+  const [isRemoteScreenSharing, setIsRemoteScreenSharing] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [remoteName, setRemoteName] = useState('');
@@ -147,6 +148,7 @@ export default function VideoCallPage({ params }) {
         // Screen share notification
         socket.on('call:screen-share', ({ isSharing }) => {
           // Remote user toggled screen sharing
+          setIsRemoteScreenSharing(isSharing);
         });
 
       } catch (err) {
@@ -268,12 +270,12 @@ export default function VideoCallPage({ params }) {
       </div>
 
       {/* Remote Video (Full screen) */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative bg-black">
         <video
           ref={remoteVideoRef}
           autoPlay
           playsInline
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
 
         {/* Placeholder when no remote stream */}
@@ -317,14 +319,14 @@ export default function VideoCallPage({ params }) {
       <motion.div
         drag
         dragConstraints={{ left: -600, right: 0, top: -400, bottom: 0 }}
-        className="absolute bottom-28 right-6 w-44 h-32 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl cursor-move z-10"
+        className="absolute bottom-28 right-6 w-44 h-32 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl cursor-move z-10 bg-black"
       >
         <video
           ref={localVideoRef}
           autoPlay
           playsInline
           muted
-          className={`w-full h-full object-cover ${!videoEnabled ? 'hidden' : ''}`}
+          className={`w-full h-full ${screenSharing ? 'object-contain' : 'object-cover -scale-x-100'} ${!videoEnabled ? 'hidden' : ''}`}
         />
         {!videoEnabled && (
           <div className="w-full h-full bg-gray-800 flex items-center justify-center">
