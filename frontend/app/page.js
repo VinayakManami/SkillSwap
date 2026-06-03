@@ -196,7 +196,7 @@ export default function LandingPage() {
             <a href="#" className="hover:text-white transition-colors">Terms</a>
             <a href="#" className="hover:text-white transition-colors">Contact</a>
           </div>
-          <p className="text-sm text-gray-500">© 2024 SkillSwap. All rights reserved.</p>
+          <p className="text-sm text-gray-500">© 2026 SkillSwap. All rights reserved.</p>
         </div>
       </footer>
     </div>
