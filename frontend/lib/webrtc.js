@@ -74,7 +74,7 @@ export class WebRTCManager {
   async getLocalStream(video = true, audio = true) {
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({
-        video: video ? { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' } : false,
+        video: video ? { facingMode: 'user' } : false,
         audio: audio ? { echoCancellation: true, noiseSuppression: true } : false,
       });
       return this.localStream;
